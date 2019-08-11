@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     build:
+       context: .
+       dockerfile: ./Dockerfile
+     image: wordpress-xdebug
+     container_name: wordpress-xdebug
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+       XDEBUG_CONFIG: remote_host=host.docker.internal remote_port=9000 remote_enable=1
+     volumes:
+       - ./src:/var/www/html 
+volumes:
+    db_data: {}
+
